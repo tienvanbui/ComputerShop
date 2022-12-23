@@ -10,10 +10,8 @@
         <thead>
           <tr>
             <th scope="col" style="font-weight: bold">#</th>
-            <th scope="col" style="font-weight: bold">Product Name</th>
-            <th scope="col" style="font-weight: bold">Image</th>
-            <th scope="col" style="font-weight: bold">Price</th>
-            <th scope="col" style="font-weight: bold">Quanlity</th>
+            <th scope="col" style="font-weight: bold">Order Code</th>
+            <th scope="col" style="font-weight: bold">Total</th>
             <th scope="col" style="font-weight: bold">Date</th>
             <th scope="col" style="font-weight: bold">Status</th>
           </tr>
@@ -23,10 +21,8 @@
           @foreach ($detailOrders as $index => $product)
             <tr>
               <th scope="row">{{ $index + 1 }}</th>
-              <td>{{ $product->product_name }}</td>
-              <td><img src="{{ asset($product->product_image) }} " width="100px" height="100px"></td>
-              <td>{{ '$' . number_format($product->price) }}</td>
-              <td>{{ $product->buy_quanlity }}</td>
+              <td>{{ $product->id }}</td>
+              <td>{{ '$' . number_format($product->total) }}</td>
               <td>{{ date('d/m/Y H:i:s', strtotime($product->created_at)) }}</td>
               <td>
                 @if ($product->status == 0)

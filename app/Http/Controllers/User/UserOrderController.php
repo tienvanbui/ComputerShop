@@ -24,7 +24,7 @@ class UserOrderController extends Controller
             ->join('products', 'products.id', '=', 'order_products.product_id')
             ->where('orders.user_id', '=', $user->id)
             ->whereNull('orders.deleted_at')
-            ->select('orders.status', 'orders.created_at', 'orders.status', 'products.product_name', 'products.product_image', 'order_products.price', 'order_products.buy_quanlity', 'orders.id')
+            ->select('orders.status', 'orders.created_at', 'orders.status', 'orders.id', 'orders.total')
             ->get();
         return view('user.order.order-track')
             ->with('detailOrders', $detailOrder)

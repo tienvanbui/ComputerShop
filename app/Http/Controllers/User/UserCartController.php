@@ -32,46 +32,48 @@ class UserCartController extends Controller
     }
     public function store(Request $request)
     {
-            $notify = checkProductIsEmptyEvent::dispatch($request->product_id, $request->color_id, $request->buy_quanlity);
-            if ($notify["0"] == 1) {
-                $response['status'] = 'warning';
-                $response['product_name'] = $request->product_name;
-                return response($response);
-            } else {
-                if ((Cart::where('user_id', auth()->user()->id))->first() == null) {
-                    $cart = new Cart();
-                    $cart = $cart->fill(['user_id' => auth()->user()->id]);
-                    $cart->save();
-                }
-                $cart = Cart::where('user_id', auth()->user()->id)->first();
-                $productStored = $cart->products()->where('product_id', $request->product_id)->first();
-                $response['product_item_in_cart'] = '';
-                $productCount = $cart->products()->count();
-                if (!empty($productStored)) {
-                    if ($productStored->pivot->color_id == $request->color_id) {
-                        $response['product_name'] = $request->product_name;
-                        $response['status'] = 'fail';
-                        $response['product_in_cart'] =  $productCount;
-                        return response($response);
-                    }
-                } else {
-                    $productNeedCheck = Product::whereId($request->product_id)->first();
-                    $priceOfProduct = $productNeedCheck->price;
-                    if (strpos($priceOfProduct, '$') !== false) {
-                        $priceOfProduct = str_replace('$', '', $priceOfProduct);
-                    }
-                    $cart->products()->attach(
-                        $request->product_id,
-                        [
-                            'buy_quanlity' => $request->buy_quanlity,
-                            'color_id' => $request->color_id,
-                            'total_price' => ((int)$request->buy_quanlity * (int)$priceOfProduct),
-                        ]
-                    );
+        $notify = checkProductIsEmptyEvent::dispatch($request->product_id, $request->color_id, $request->buy_quanlity);
+        if ($notify["0"] == 1) {
+            $response['status'] = 'warning';
+            $response['product_name'] = $request->product_name;
+            return response($response);
+        } else {
+            if ((Cart::where('user_id', auth()->user()->id))->first() == null) {
+                $cart = new Cart();
+                $cart = $cart->fill(['user_id' => auth()->user()->id]);
+                $cart->save();
+            }
+            $cart = Cart::where('user_id', auth()->user()->id)->first();
+            $productStored = $cart->products()->where('product_id', $request->product_id)->first();
+            $response['product_item_in_cart'] = '';
+            $productCount = $cart->products()->count();
+            if (!empty($productStored)) {
+                if ($productStored->pivot->color_id == $request->color_id) {
                     $response['product_name'] = $request->product_name;
-                    $response['status'] = 'success';
-                    $response['product_in_cart'] =  $productCount + 1;
-                    $response['product_item_in_cart'] .= '
+                    $response['status'] = 'fail';
+                    $response['product_in_cart'] =  $productCount;
+                    return response($response);
+                }
+            } else {
+                $productNeedCheck = Product::whereId($request->product_id)->first();
+                $priceOfProduct = $productNeedCheck->price;
+
+                if (strpos($priceOfProduct, ',') !== false) {
+                    $priceOfProduct = str_replace(',', '', $priceOfProduct);
+                }
+
+                $cart->products()->attach(
+                    $request->product_id,
+                    [
+                        'buy_quanlity' => $request->buy_quanlity,
+                        'color_id' => $request->color_id,
+                        'total_price' => ((int)$request->buy_quanlity * (int)$priceOfProduct),
+                    ]
+                );
+                $response['product_name'] = $request->product_name;
+                $response['status'] = 'success';
+                $response['product_in_cart'] =  $productCount + 1;
+                $response['product_item_in_cart'] .= '
                 <li class="header-cart-item flex-w flex-t m-b-12">
                     <div class="header-cart-item-img">
                         <img src="' . $productNeedCheck->product_image . '" alt="' . $productNeedCheck->product_image_name . '">
@@ -87,10 +89,10 @@ class UserCartController extends Controller
                         </span>
                     </div>  
                  </li>';
-                    $response['product_sum_all_product_price'] = $cart->products()->sum('total_price');
-                    return response($response);
-                }
+                $response['product_sum_all_product_price'] = $cart->products()->sum('total_price');
+                return response($response);
             }
+        }
     }
     public function deleteFromCart(Request $request)
     {
@@ -108,8 +110,8 @@ class UserCartController extends Controller
                 ->join('cart_products', 'carts.id', '=', 'cart_products.cart_id')->select('cart_products.*')
                 ->first();
             $priceOfProduct = (Product::whereId($request->product_id)->first())->price;
-            if (strpos($priceOfProduct, '$') !== false) {
-                $priceOfProduct = str_replace('$', '', $priceOfProduct);
+            if (strpos($priceOfProduct, ',') !== false) {
+                $priceOfProduct = str_replace(',', '', $priceOfProduct);
             }
             $cart->products()->detach($request->product_id);
             $cart->products()->attach(
@@ -199,22 +201,22 @@ class UserCartController extends Controller
                 $newOrder->phoneNumber_shipping = $request->phoneNumberShipping;;
                 $newOrder->save();
                 $products = $newOrder->userCart()->products()->get();
+
                 foreach ($products as $product) {
+                    $price = $product->price;
+                    if (strpos($price, ',') !== false) {
+                        $price = str_replace(',', '', $price);
+                    }
                     $newOrder->products()->attach(
                         $product->id,
                         [
                             'buy_quanlity' => $product->pivot->buy_quanlity,
                             'color_id' => $product->pivot->color_id,
-                            'price' => $product->price
+                            'price' => $price
                         ]
                     );
                 }
                 $newOrder->userCart()->products()->detach();
-                $productsInYourOrder = DB::table('order_products')
-                    ->join('products', 'order_products.product_id', '=', 'products.id')
-                    ->select('order_products.buy_quanlity', 'products.product_name', 'products.product_image', 'products.price')
-                    ->get();
-                sendMailAppectOrderdEvent::dispatch(auth()->user()->name, auth()->user()->email, $productsInYourOrder);
                 $response['status'] = 'success';
             }
             return response($response);

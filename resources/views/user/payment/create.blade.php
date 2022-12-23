@@ -23,13 +23,13 @@
                     </div>
                   </td>
                   <td class="column-2">{{ $item->product_name }}</td>
-                  <td class="column-3">{{ '$' . number_format($item->price) }}</td>
+                  <td class="column-3">{{ '$' . $item->price }}</td>
                   <td class="column-4">
                     <div class="text-center">
                       {{ 'x' . $item->pivot->buy_quanlity }}
                     </div>
                   </td>
-                  <td class="column-5">{{ '$' . number_format($item->pivot->total_price) }}</td>
+                  <td class="column-5">{{ '$' . $item->pivot->total_price }}</td>
                 </tr>
               @endforeach
             </table>
