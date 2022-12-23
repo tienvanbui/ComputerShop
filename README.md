@@ -39,3 +39,6 @@ Bước 6:Tạo link liên kết thư mục storage
 + slider_images
 + thumbnails
 tại đường dẫn storage/app/public vào đường dẫn public/storage
+
+Bước 7: chạy php artisan serve
+Bước 8: http://127.0.0.1:8000/home để vào trang chủ
