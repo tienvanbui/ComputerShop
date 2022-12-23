@@ -44,18 +44,11 @@
   </div>
     <div class="form-group">
     <label for="phone">Phone Number:</label>
-    <input type="text" class="form-control" id="phone" aria-describedby="phone" name="phoneNumber" value="{{ old('phoneNumber') }}">
+    <input type="text" class="form-control" id="phone" aria-describedby="phone" name="phoneNumber" value="{{ $user->phoneNumber }}">
   </div>
   <div class="form-group">
     <label for="adrress">Addres:</label>
-    <input type="text" class="form-control" id="adrress" aria-describedby="adrress" name="adrress" value="{{ old('adrress') }}">
-  </div>
-  <div class="form-group">
-    <label for="status">Status:</label>
-    <select name="status" id="status" class="form-control">
-      <option value="1">Banned</option>
-      <option value="0">Not Banned</option>
-    </select>
+    <input type="text" class="form-control" id="adrress" aria-describedby="adrress" name="adrress" value="{{$user->address }}">
   </div>
   <div class="form-group">
     <label for="role">Role:</label>

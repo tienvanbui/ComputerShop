@@ -222,7 +222,7 @@
 
                     <span class="header-cart-item-info">
                       {{ $product->pivot->buy_quanlity }} x
-                      {{ '$' . number_format($product->price) }}
+                      {{ '$' .$product->price }}
                     </span>
                   </div>
                 </li>
@@ -233,7 +233,7 @@
 
           <div class="w-full">
             <div class="header-cart-total w-full p-tb-40">
-              Total: {{ '$' . number_format($totalPrice) }}
+              Total: {{ '$' . $totalPrice }}
             </div>
             <div class="header-cart-buttons flex-w w-full">
               <a href="{{ route('view-cart') }}"

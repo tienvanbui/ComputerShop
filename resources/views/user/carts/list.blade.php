@@ -31,7 +31,7 @@
                       </form>
                     </td>
                     <td class="column-2">{{ $item->product_name }}</td>
-                    <td class="column-3">{{ '$' . number_format($item->price) }}</td>
+                    <td class="column-3">{{ '$' . $item->price }}</td>
                     <td class="column-4">
                       <form method="post" class="update-cart-ajax">
                         @method('PUT')
@@ -53,7 +53,7 @@
                         </div>
                     </td>
                     <td class="column-5">
-                      {{ '$' . number_format($item->pivot->total_price) }}</td>
+                      {{ '$' . $item->pivot->total_price }}</td>
                     <td class="column-6">
                       <button type="button"
                         class="flex-c-m stext-110 cl2 size-122  bor13 hov-btn3  trans-04 pointer m-tb-10 mr-5 btnUpdateCartItem">
