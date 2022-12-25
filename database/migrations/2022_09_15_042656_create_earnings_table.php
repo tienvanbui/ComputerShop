@@ -19,7 +19,6 @@ class CreateEarningsTable extends Migration
             $table->dateTime('order_date');
             $table->unsignedBigInteger('quanlities_orders');
             $table->unsignedBigInteger('quanlities_products_in_order');
-            $table->softDeletes();
         });
     }
 

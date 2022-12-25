@@ -210,11 +210,11 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         //delete all product detail image
-        foreach ($product->productImages as $item) {
-            $this->delteOldImageWhenUpdateWithoutCheckExists('img_path', $item);
-        }
+        // foreach ($product->productImages as $item) {
+        //     $this->delteOldImageWhenUpdateWithoutCheckExists('img_path', $item);
+        // }
         //delete product image
-        $this->delteOldImageWhenUpdateWithoutCheckExists('product_image', $product);
+        //$this->delteOldImageWhenUpdateWithoutCheckExists('product_image', $product);
         $product->productImages()->delete();
         $product->productDetail()->delete();
         $product->colors()->detach();

@@ -13,6 +13,7 @@ class HomeController extends Controller
     {
         $this->setModel(Blog::class);
         $this->getAppMenu();
+        $this->resourceName = 'products';
     }
     /**
      * Show the application dashboard.

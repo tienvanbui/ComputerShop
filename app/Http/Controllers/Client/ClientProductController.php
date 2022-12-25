@@ -76,7 +76,7 @@ class ClientProductController extends Controller
         }
         $colors = Color::all();
         $category_id = (Category::where('name', ucwords($slug))->first())->id;
-        $products = Product::where('category_id', $category_id)->latest()->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
+        $products = Product::whereNull('deleted_at')->where('category_id', $category_id)->latest()->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
         return view('user.product.index', [
             'colors' => $colors,
             'products' => $products,
@@ -100,6 +100,7 @@ class ClientProductController extends Controller
                         ->select("products.*")
                         ->where('categories.name', "=",  Str::ucfirst($request->category_name))
                         ->where('products.id', '<', $request->id)
+                        ->whereNull('deleted_at')
                         ->orderBy('products.id', 'DESC')
                         ->limit(config('appConst.appConst.ITEM_IN_PER_PAGE'))
                         ->get();
@@ -107,6 +108,7 @@ class ClientProductController extends Controller
                     $data = DB::table('products')
                         ->where('id', '<', $request->id)
                         ->orderBy('id', 'DESC')
+                        ->whereNull('deleted_at')
                         ->limit(config('appConst.appConst.ITEM_IN_PER_PAGE'))
                         ->get();
                 }
@@ -117,11 +119,13 @@ class ClientProductController extends Controller
                         ->select("products.*")
                         ->where('categories.name', "=", Str::ucfirst($request->category_name))
                         ->orderBy('products.id', 'DESC')
+                        ->whereNull('deleted_at')
                         ->limit(config('appConst.appConst.ITEM_IN_PER_PAGE'))
                         ->get();
                 } else {
                     $data = DB::table('products')
                         ->orderBy('id', 'DESC')
+                        ->whereNull('deleted_at')
                         ->limit(config('appConst.appConst.ITEM_IN_PER_PAGE'))
                         ->get();
                 }
@@ -210,6 +214,7 @@ class ClientProductController extends Controller
             if (empty($request->category_name)) {
                 if (empty($request->color) && empty($request->price) && empty($request->sort_by)) {
                     $products = DB::table('products')
+                        ->whereNull('deleted_at')
                         ->latest()
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                 }
@@ -224,6 +229,7 @@ class ClientProductController extends Controller
                             ->join('colors', 'color_products.color_id', '=', 'colors.id')
                             ->whereBetween('price', [$minPrice, $maxPrice])
                             ->where('color_name', '=', $color_filter)
+                            ->whereNull('deleted_at')
                             ->orderBy('price', 'ASC')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
@@ -233,6 +239,7 @@ class ClientProductController extends Controller
                             ->join('colors', 'color_products.color_id', '=', 'colors.id')
                             ->whereBetween('price', [$minPrice, $maxPrice])
                             ->where('color_name', '=', $color_filter)
+                            ->whereNull('deleted_at')
                             ->orderByDesc('price')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
@@ -241,6 +248,7 @@ class ClientProductController extends Controller
                     $minPrice = explode('-', $request->price)[1];
                     $maxPrice = explode('-', $request->price)[3];
                     $products = DB::table('products')
+                        ->whereNull('deleted_at')
                         ->whereBetween('price', [$minPrice, $maxPrice])
                         ->limit(config('appConst.appConst.ITEM_IN_PER_PAGE'))
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
@@ -251,6 +259,7 @@ class ClientProductController extends Controller
                         ->join('color_products', 'products.id', '=', 'color_products.product_id')
                         ->join('colors', 'color_products.color_id', '=', 'colors.id')
                         ->select('products.*')
+                        ->whereNull('deleted_at')
                         ->where('color_name', '=', $color_filter)
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                 }
@@ -258,11 +267,13 @@ class ClientProductController extends Controller
                     $sort_type = $request->sort_by;
                     if ($sort_type == 'price-low-to-high') {
                         $products = DB::table('products')
+                            ->whereNull('deleted_at')
                             ->orderBy('price', 'ASC')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
                     if ($sort_type == 'price-high-to-low') {
                         $products = DB::table('products')
+                            ->whereNull('deleted_at')
                             ->orderByDesc('price')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
@@ -275,6 +286,7 @@ class ClientProductController extends Controller
                         ->join('color_products', 'products.id', '=', 'color_products.product_id')
                         ->join('colors', 'color_products.color_id', '=', 'colors.id')
                         ->select('products.*')
+                        ->whereNull('deleted_at')
                         ->whereBetween('price', [$minPrice, $maxPrice])
                         ->where('color_name', '=', $color_filter)
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
@@ -288,6 +300,7 @@ class ClientProductController extends Controller
                             ->join('colors', 'color_products.color_id', '=', 'colors.id')
                             ->select('products.*')
                             ->where('color_name', '=', $color_filter)
+                            ->whereNull('deleted_at')
                             ->orderBy('price', 'ASC')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
@@ -297,6 +310,7 @@ class ClientProductController extends Controller
                             ->select('products.*')
                             ->join('colors', 'color_products.color_id', '=', 'colors.id')
                             ->where('color_name', '=', $color_filter)
+                            ->whereNull('deleted_at')
                             ->orderByDesc('price')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
@@ -307,12 +321,14 @@ class ClientProductController extends Controller
                     $maxPrice = explode('-', $request->price)[3];
                     if ($sort_type == 'price-low-to-high') {
                         $products = DB::table('products')
+                            ->whereNull('deleted_at')
                             ->whereBetween('price', [$minPrice, $maxPrice])
                             ->orderBy('price', 'ASC')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
                     if ($sort_type == 'price-high-to-low') {
                         $products = DB::table('products')
+                            ->whereNull('deleted_at')
                             ->whereBetween('price', [$minPrice, $maxPrice])
                             ->orderBy('price', 'DESC')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
@@ -323,6 +339,7 @@ class ClientProductController extends Controller
             else {
                 if (empty($request->color) && empty($request->price) && empty($request->sort_by)) {
                     $products = DB::table('products')
+                        ->whereNull('deleted_at')
                         ->join('categories', 'categories.id', "=", 'products.category_id')
                         ->where('categories.name', "=", Str::ucfirst($request->category_name))
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
@@ -334,23 +351,27 @@ class ClientProductController extends Controller
                     $color_filter = $request->color;
                     if ($sort_type == 'price-low-to-high') {
                         $products = DB::table('products')
+
                             ->join('color_products', 'products.id', '=', 'color_products.product_id')
                             ->join('colors', 'color_products.color_id', '=', 'colors.id')
                             ->join('categories', 'categories.id', "=", 'products.category_id')
                             ->where('categories.name', "=", Str::ucfirst($request->category_name))
                             ->whereBetween('price', [$minPrice, $maxPrice])
                             ->where('color_name', '=', $color_filter)
+                            ->whereNull('deleted_at')
                             ->orderBy('price', 'ASC')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
                     if ($sort_type == 'price-high-to-low') {
                         $products = DB::table('products')
+
                             ->join('color_products', 'products.id', '=', 'color_products.product_id')
                             ->join('colors', 'color_products.color_id', '=', 'colors.id')
                             ->join('categories', 'categories.id', "=", 'products.category_id')
                             ->where('categories.name', "=", Str::ucfirst($request->category_name))
                             ->whereBetween('price', [$minPrice, $maxPrice])
                             ->where('color_name', '=', $color_filter)
+                            ->whereNull('deleted_at')
                             ->orderByDesc('price')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
@@ -362,6 +383,7 @@ class ClientProductController extends Controller
                         ->join('categories', 'categories.id', "=", 'products.category_id')
                         ->where('categories.name', "=", Str::ucfirst($request->category_name))
                         ->whereBetween('price', [$minPrice, $maxPrice])
+                        ->whereNull('deleted_at')
                         ->limit(config('appConst.appConst.ITEM_IN_PER_PAGE'))
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                 }
@@ -372,6 +394,7 @@ class ClientProductController extends Controller
                         ->join('colors', 'color_products.color_id', '=', 'colors.id')
                         ->join('categories', 'categories.id', "=", 'products.category_id')
                         ->select('products.*')
+                        ->whereNull('deleted_at')
                         ->where('color_name', '=', $color_filter)
                         ->where('categories.name', "=", Str::ucfirst($request->category_name))
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
@@ -382,6 +405,7 @@ class ClientProductController extends Controller
                         $products = DB::table('products')
                             ->join('categories', 'categories.id', "=", 'products.category_id')
                             ->where('categories.name', "=", Str::ucfirst($request->category_name))
+                            ->whereNull('deleted_at')
                             ->orderBy('price', 'ASC')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
@@ -404,6 +428,7 @@ class ClientProductController extends Controller
                         ->select('products.*')
                         ->whereBetween('price', [$minPrice, $maxPrice])
                         ->where('color_name', '=', $color_filter)
+                        ->whereNull('deleted_at')
                         ->where('categories.name', "=", Str::ucfirst($request->category_name))
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                 }
@@ -416,6 +441,7 @@ class ClientProductController extends Controller
                             ->join('colors', 'color_products.color_id', '=', 'colors.id')
                             ->join('categories', 'categories.id', "=", 'products.category_id')
                             ->select('products.*')
+                            ->whereNull('deleted_at')
                             ->where('color_name', '=', $color_filter)
                             ->where('categories.name', "=", Str::ucfirst($request->category_name))
                             ->orderBy('price', 'ASC')
@@ -429,6 +455,7 @@ class ClientProductController extends Controller
                             ->select('products.*')
                             ->where('color_name', '=', $color_filter)
                             ->where('categories.name', "=", Str::ucfirst($request->category_name))
+                            ->whereNull('deleted_at')
                             ->orderByDesc('price')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
@@ -442,6 +469,7 @@ class ClientProductController extends Controller
                             ->join('categories', 'categories.id', "=", 'products.category_id')
                             ->where('categories.name', "=", Str::ucfirst($request->category_name))
                             ->whereBetween('price', [$minPrice, $maxPrice])
+                            ->whereNull('deleted_at')
                             ->orderBy('price', 'ASC')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                     }
@@ -449,6 +477,7 @@ class ClientProductController extends Controller
                         $products = DB::table('products')
                             ->join('categories', 'categories.id', "=", 'products.category_id')
                             ->where('categories.name', "=", Str::ucfirst($request->category_name))
+                            ->whereNull('deleted_at')
                             ->whereBetween('price', [$minPrice, $maxPrice])
                             ->orderBy('price', 'DESC')
                             ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
@@ -478,10 +507,12 @@ class ClientProductController extends Controller
                 $products = DB::table('products')
                     ->join('categories', 'categories.id', "=", "products.category_id")
                     ->where('categories.name', '=', Str::ucfirst($request->category_name))
+                    ->whereNull('deleted_at')
                     ->where('product_name', 'LIKE', '%' . $request->search_keyword . '%')
                     ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
             } else if (!empty($request->search_keyword) && empty($request->color) && empty($request->price) && empty($request->sort_by) && empty($request->category_name)) {
                 $products = DB::table('products')
+                    ->whereNull('deleted_at')
                     ->where('product_name', 'LIKE', '%' . $request->search_keyword . '%')
                     ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
             } else {
@@ -499,10 +530,12 @@ class ClientProductController extends Controller
             if (empty($request->category_name)) {
                 if (empty($request->search_keyword)) {
                     $products = DB::table('products')
+                        ->whereNull('deleted_at')
                         ->latest()
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                 } else {
                     $products = DB::table('products')
+                        ->whereNull('deleted_at')
                         ->where('products.product_name', 'LIKE', '%' . $request->search_keyword . '%')
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                 }
@@ -511,6 +544,7 @@ class ClientProductController extends Controller
                     $products = DB::table('products')
                         ->join('categories', 'categories.id', "=", "products.category_id")
                         ->where('categories.name', '=', Str::ucfirst($request->category_name))
+                        ->whereNull('deleted_at')
                         ->orderBy('products.id', 'DESC')
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                 } else {
@@ -518,6 +552,7 @@ class ClientProductController extends Controller
                         ->join('categories', 'categories.id', "=", "products.category_id")
                         ->where('categories.name', '=', Str::ucfirst($request->category_name))
                         ->where('products.product_name', 'LIKE', '%' . $request->search_keyword . '%')
+                        ->whereNull('deleted_at')
                         ->orderBy('products.id', 'DESC')
                         ->paginate(config('appConst.appConst.ITEM_IN_PER_PAGE'));
                 }
@@ -580,6 +615,7 @@ class ClientProductController extends Controller
                     ->where('id', '<', $request->id)
                     ->where('commentable_type', '=', Product::class)
                     ->where('commentable_id', '=', $request->product_id)
+
                     ->orderBy('id', 'DESC')
                     ->limit(1)
                     ->get();

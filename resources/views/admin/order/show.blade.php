@@ -57,7 +57,6 @@
                       <th scope="col" class="text-center">Product</th>
                       <th scope="col">Image</th>
                       <th scope="col" class="text-center">Quanlity</th>
-                      <th scope="col" class="text-center">Size</th>
                       <th scope="col" class="text-center">Color</th>
                       <th scope="col" class="text-center">Price</th>
                     </tr>
@@ -69,13 +68,11 @@
                         <td><img src="{{ $product->product_image }}" alt="{{ $product->product_image_name }}"
                             width="100rem" height="100rem"></td>
                         <td class="text-center">{{ $product->pivot->buy_quanlity }}</td>
-                        <td class="text-center">
-                          {{ $product->sizes()->where('sizes.id', '=', $product->pivot->size_id)->first()->size_name }}
-                        </td>
+                      
                         <td class="text-center">
                           {{ $product->colors()->where('colors.id', '=', $product->pivot->color_id)->first()->color_name }}
                         </td>
-                        <td class="text-center">{{ '$' . number_format($product->price) }}</td>
+                        <td class="text-center">{{ '$' . $product->price }}</td>
                       </tr>
                     @endforeach
                   </tbody>

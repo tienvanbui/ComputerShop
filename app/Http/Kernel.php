@@ -71,6 +71,5 @@ class Kernel extends HttpKernel
         'role' => RoleMiddleware::class,
         'ajax.isLogined'=>\App\Http\Middleware\AjaxRequestOnly::class,
         'doNotCacheResponse' => \Spatie\ResponseCache\Middlewares\DoNotCacheResponse::class,
-        'cacheResponse' => \Spatie\ResponseCache\Middlewares\CacheResponse::class,
     ];
 }
