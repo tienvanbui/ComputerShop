@@ -14,7 +14,7 @@ class PaymentController extends Controller
         $this->resourceName = 'payments';
         $this->modelName = 'Payment';
         $this->validateRule = [
-            'payment_method' => 'required|string|unique:payments|bail',
+            'payment_method' => 'required|string|bail',
         ];
         $this->views = [
             'index' => 'admin.payment.index',

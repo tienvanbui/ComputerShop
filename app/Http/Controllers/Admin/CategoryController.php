@@ -20,7 +20,7 @@ class CategoryController extends Controller
             'edit' => 'admin.category.edit',
         ];
         $this->validateRule = [
-            'name'=>'string|required|max:30|bail|unique:categories',
+            'name'=>'string|required|max:30|bail',
         ];
     }
     public function update($id,Request $request){

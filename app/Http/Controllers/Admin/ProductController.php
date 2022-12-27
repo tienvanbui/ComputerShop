@@ -26,7 +26,7 @@ class ProductController extends Controller
             'show' => 'admin.product.show'
         ];
         $this->validateRule = [
-            'product_name' => 'required|unique:products|bail',
+            'product_name' => 'required|bail',
             'product_image' => 'required|image|bail',
             'product_image_name' => 'required|bail',
             'price' => 'required|bail',
